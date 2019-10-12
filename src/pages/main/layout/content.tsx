@@ -4,6 +4,9 @@ import { Route, Switch } from "react-router-dom";
 
 import routes from '../router'
 
+import { Layout } from 'antd';
+const { Content } = Layout;
+
 class ContentLayout extends Component<Props, State> {
     static defaultProps = {}
 
@@ -20,7 +23,7 @@ class ContentLayout extends Component<Props, State> {
         const  { url } =this.props;
         console.log(this.props,routes);
         return (
-            <div className="content-container">
+            <Content className="content-container">
                 <Switch>
                     {
                         routes.map((item,i) =>
@@ -30,7 +33,7 @@ class ContentLayout extends Component<Props, State> {
                         )
                     }
                 </Switch>
-            </div>
+            </Content>
         )
     }
 }

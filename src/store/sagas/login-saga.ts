@@ -5,10 +5,12 @@ import { userLogin,getRoleMenu } from './../../api/login-api'
 
 function* loginAsync(payload:any) {
     try {
-        const { data } =  yield call(userLogin,payload);
+        let { data } =  yield call(userLogin,payload);
+        sessionStorage.setItem('USER_TOKEN', data.token);
         yield put({ type: 'USER_LOGIN', payload:data })
-        const { menuList } = yield call(getRoleMenu,{})
-        yield put({ type: 'USER_MENU_LIST', payload:menuList })
+        let menuList = yield call(getRoleMenu,{})
+        sessionStorage.setItem('USER_MENU_LIST',JSON.stringify(menuList.data || []));
+        yield put({ type: 'USER_MENU_LIST', payload:menuList.data })
     }catch (e) {
         yield put({ type: 'FETCH_ERROR', e })
     }
@@ -18,7 +20,6 @@ export function* loginFlow() {
 
     while (true){
         const { payload } = yield take('LOGIN_REQUEST')
-        console.log( payload )
         const data = yield call(loginAsync,payload);
     }
 

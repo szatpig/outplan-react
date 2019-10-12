@@ -1,5 +1,6 @@
 // Created by szatpig at 2019/8/20.
 import React, { Component } from 'react'
+import { withRouter, Redirect } from 'react-router';
 import { connect } from 'react-redux'
 import { FormComponentProps } from 'antd/es/form';
 import { Link } from 'react-router-dom'
@@ -7,7 +8,7 @@ import { Form, Icon, Input, Button } from 'antd';
 import md5 from 'js-md5';
 import { EncryptStr } from './../../utils/utils'
 
-import {userLoginRequestAction } from './../../store/actions/user'
+import { userLoginRequestAction } from './../../store/actions/user'
 import EnhanceIdentifyCode from './../../components/IdentifyCode'
 import logo from '@/images/logo-text.png'
 
@@ -60,6 +61,10 @@ class Login extends Component<UserFormProps, State> {
 
     render() {
         const { getFieldDecorator } = this.props.form;
+        console.log('token:',this.props.userToken)
+        if(this.props.userToken){
+            return <Redirect to='/home/dashboard'/>
+        }
         return (
             <div className="login-container flex-container">
                 <div className="logo-wrapper">
@@ -124,6 +129,7 @@ const EnhancedLogin = Form.create({ name: 'login' })(Login);
 interface UserFormProps extends FormComponentProps {
     username: number;
     password: string;
+    userToken:string;
     userLoginRequestAction?: any;
 }
 
@@ -131,7 +137,7 @@ interface State {
 }
 
 const mapStateToProps = (state:any) => ({
-    userToken:state.userToken
+    userToken:state.user.token
 })
 
 const mapDispatchToProps = {

@@ -7,8 +7,8 @@ import {
 } from './../actionTypes'
 
 const initState:State = {
-    token:null,
-    menuList:[]
+    token:sessionStorage.getItem('USER_TOKEN') || null,
+    menuList: sessionStorage.getItem('USER_MENU_LIST') && JSON.parse(sessionStorage.getItem('USER_MENU_LIST') || '') || []
 };
 
 let userReducer = (state:State = initState,action:any):any => {
