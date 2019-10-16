@@ -12,7 +12,6 @@ const initState:State = {
 };
 
 let userReducer = (state:State = initState,action:any):any => {
-    console.log('userReducer',action.payload);
     switch (action.type) {
         case USER_LOGINOUT:
             return initState;

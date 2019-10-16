@@ -21,11 +21,16 @@ class Home extends Component<Props, State>{
         }
         return (
             <Layout className="main-container">
-                <Sider  trigger={ null } collapsible collapsed={ this.props.collapsed } className="menu-container" width={ 180 }>
+                <Sider
+                    trigger={ null }
+                    collapsible
+                    collapsed={ this.props.collapsed }
+                    className="menu-container"
+                    width={ 180 }>
                     <MenuLayout />
                 </Sider>
                 <Layout className="wrapper-container">
-                    <HeaderLayout />
+                    <HeaderLayout { ...this.props.match } />
                     <ErrorBoundary>
                         <ContentLayout { ...this.props.match } />
                     </ErrorBoundary>

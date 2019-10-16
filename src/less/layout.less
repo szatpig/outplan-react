@@ -12,7 +12,7 @@
             padding: 0 24px;
             cursor: pointer;
             transition: color 0.3s;
-            &:hover{
+            :hover {
                 color: #1890ff;
             }
         }
@@ -26,25 +26,26 @@
             }
             .left-wrap {
                 i{
-                display: inline-block;
-                margin-left: 20px;
-                margin-right: 19px;
-                padding-right: 18px;
-                font-size: 18px;
-                color: #999;
-                cursor: pointer;
-                position: relative;
-                line-height: 60px;
-                &:after{
-                    content: '';
-                    position: absolute;
-                    top: 18px;
-                    right: 0;
-                    width: 1px;
-                    height: 20px;
-                    background-color: #e0e0e0;
+                    display: inline-block;
+                    margin-right: 19px;
+                    padding-right: 18px;
+                    font-size: 18px;
+                    color: #999;
+                    cursor: pointer;
+                    position: relative;
+                    overflow: hidden;
+                    height: 55px;
+                    line-height: 60px;
+                    &:after{
+                        content: '';
+                        position: absolute;
+                        top: 18px;
+                        right: 0;
+                        width: 1px;
+                        height: 20px;
+                        background-color: #e0e0e0;
+                    }
                 }
-            }
             }
             .right-wrap{
                 .item-wrap{
@@ -98,6 +99,9 @@
             height: 50px !important;
             line-height: 50px !important;
             background: #20335d !important;
+            a{
+                color: inherit;
+            }
             &.ant-menu-item-selected,&.ant-menu-item-active{
                 background: #152547!important;
                 color: #2d8cf0;

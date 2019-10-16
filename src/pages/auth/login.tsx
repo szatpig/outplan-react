@@ -63,7 +63,7 @@ class Login extends Component<UserFormProps, State> {
         const { getFieldDecorator } = this.props.form;
         console.log('token:',this.props.userToken)
         if(this.props.userToken){
-            return <Redirect to='/home/dashboard'/>
+            return <Redirect to='/home/sceneManager/sceneList'/>
         }
         return (
             <div className="login-container flex-container">

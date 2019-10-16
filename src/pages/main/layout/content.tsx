@@ -21,14 +21,14 @@ class ContentLayout extends Component<Props, State> {
 
     render() {
         const  { url } =this.props;
-        console.log(this.props,routes);
+        // console.log(this.props,routes);
         return (
             <Content className="content-container">
                 <Switch>
                     {
-                        routes.map((item,i) =>
+                        routes.map((item:any,i) =>
                             item.path ?
-                                <Route key={ i } path={ url + item.path } component={ item.component } exact strict /> :
+                                <Route key={ i } { ...item.meta } path={ url + item.path } component={ item.component } exact strict /> :
                                 <Route key={ i } component={ item.component } />
                         )
                     }
