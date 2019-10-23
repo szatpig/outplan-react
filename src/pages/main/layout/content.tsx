@@ -21,7 +21,6 @@ class ContentLayout extends Component<Props, State> {
 
     render() {
         const  { url } =this.props;
-        // console.log(this.props,routes);
         return (
             <Content className="content-container">
                 <Switch>

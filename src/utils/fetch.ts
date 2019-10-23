@@ -81,7 +81,7 @@ export default function fetch (url:string, options:Options) {
         //设置超时时间
         timeout: opt.timeout || 30000
     }
-    console.log(store.getState())
+    // console.log(store.getState())
     return new Promise((resolve, reject) => {
         axios({
             method: opt.type || "post",

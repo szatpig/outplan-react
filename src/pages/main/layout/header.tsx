@@ -38,10 +38,8 @@ class HeaderLayout extends Component<Props, State> {
 
     getBreadcrumbName = (pathname:string,routes:any) =>{
         const routeItem = routes.find((item:any)=> item.path && (item.path === pathname.replace(/\/home/g,'')));
-        console.log(routeItem);
         if(!routeItem) return <Breadcrumb.Item > 404 </Breadcrumb.Item>;
         const pathUrl = routeItem.path.slice(1).split('/');
-        console.log(pathUrl);
         return Object.values(routeItem.meta.title).map((item:any, index, arr)=>{
             if(arr.length - index > 1 && (!routeItem.meta.collapsed || routeItem.meta.collapsed && index != 0)){
                 return <Breadcrumb.Item key={ index }><Link to={ '/home/' + pathUrl.slice(0,-(pathUrl.length - index -1)).join('/') }>{ item }</Link></Breadcrumb.Item>

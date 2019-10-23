@@ -7,8 +7,9 @@ function* loginAsync(payload:any) {
     try {
         let { data } =  yield call(userLogin,payload);
         sessionStorage.setItem('USER_TOKEN', data.token);
-        sessionStorage.setItem('USER_INFO', data);
-        yield put({ type: 'USER_LOGIN', payload:data })
+        sessionStorage.setItem('USER_INFO', JSON.stringify(data));
+        yield put({ type: 'USER_TOKEN', payload:{ token:data.token }})
+        yield put({ type: 'USER_INFO', payload:data })
         let menuList = yield call(getRoleMenu,{})
         sessionStorage.setItem('USER_MENU_LIST',JSON.stringify(menuList.data || []));
         yield put({ type: 'USER_MENU_LIST', payload:menuList.data })

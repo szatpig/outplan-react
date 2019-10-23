@@ -98,7 +98,7 @@ export default [
             }
         }
     },{
-        path:'/system/RoleManage',
+        path:'/system/roleManage',
         component:RoleManage,
         meta:{
             collapsed:true,
@@ -108,7 +108,7 @@ export default [
             }
         }
     },{
-        path:'/system/user',
+        path:'/system/userManage',
         component:UserManage,
         meta:{
             collapsed:true,

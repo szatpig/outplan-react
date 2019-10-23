@@ -168,6 +168,31 @@
         background-color: #fff;
         .wrapper-container{
             padding: 24px;
+            height: 100%;
         }
+    }
+    .search-container{
+        display: -webkit-flex;
+        display: flex;
+        -webkit-flex-flow: row nowrap;
+        flex-flow: row nowrap;
+        -webkit-justify-content: space-between;
+        justify-content: space-between;
+        position:relative;
+        padding-bottom:25px;
+        .input-cells{
+            display: flex;
+            align-items: center;
+            & > .ant-select,.ant-input-group,.ant-btn{
+                margin-right: 5px;
+                border-radius:0;
+            }
+        }
+    }
+    .table-container{
+
+    }
+    .page-container{
+
     }
 }
