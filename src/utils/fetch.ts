@@ -1,10 +1,13 @@
 // Created by szatpig at 2019/5/21.
 import axios,{ AxiosRequestConfig } from 'axios'
+import { createBrowserHistory } from 'history';
 import { stringify } from 'qs'
 import store from './../store'
 
 
 import { message } from 'antd';
+
+const history = createBrowserHistory();
 
 // axios 配置
 axios.defaults.timeout = 5000;
@@ -99,7 +102,8 @@ export default function fetch (url:string, options:Options) {
                 resolve(response.data)
             } else {
                 switch (response.data.status) {
-                    case 2011:
+                    case 1001:
+                        history.push('/login');
                         reject(response.data);
                         break;
                     case 8001:
