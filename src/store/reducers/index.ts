@@ -4,10 +4,12 @@ import { combineReducers } from 'redux'
 
 import user from './user'
 import header from './header'
+import system from  './system'
 
 export default combineReducers({
     user,
-    header
+    header,
+    system
 })
 
 

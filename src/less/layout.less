@@ -184,12 +184,29 @@
             display: flex;
             align-items: center;
             & > .ant-select,.ant-input-group,.ant-btn{
+                //margin-right: 5px;
+            }
+            .ant-input-group-compact{
+                width: auto;
+            }
+            .ant-form-inline .ant-form-item{
                 margin-right: 5px;
-                border-radius:0;
             }
         }
     }
     .table-container{
+        table {
+            .ant-table-thead > tr > th, .ant-table-tbody > tr > td{
+                //padding: 8px 16px;
+            }
+            .tableActionCell{
+                i{
+                    margin-right: 8px;
+                    color: @primary-color;
+                    cursor: pointer;
+                }
+            }
+        }
 
     }
     .page-container{

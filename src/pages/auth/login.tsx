@@ -24,6 +24,7 @@ class Login extends Component<UserFormProps, State> {
 
     componentDidMount() {
         sessionStorage.clear();
+        console.log(this.props)
         let _data ={
 
         }

@@ -1,38 +1,180 @@
 // Created by szatpig at 2019/8/21.
-import React, { useState, useEffect } from 'react';
-import { Tree, Input, Select, Button, Table } from 'antd';
+import React, { useState, useEffect, useReducer, forwardRef } from 'react';
+import { connect } from 'react-redux'
+import { Tree, Input, Select, Button, Table, Form, Modal, message } from 'antd';
+import { FormComponentProps } from 'antd/es/form';
 
+import { systemUserRequestAction } from './../../../store/actions/system'
+
+import UserSearchComponent from './components/UserSearchComponent'
+
+import searchTree from './../../../utils/treeNode'
 import { getAllDepart, userInfoList, getRoleListByDepartList, getDpartAndChild } from './../../../api/system-api'
 import  './../../../less/system/user.less'
+import EnhancedUserSearchComponent from "./components/UserSearchComponent";
 
 const { TreeNode } = Tree;
 const { Search } = Input;
 const { Option } = Select;
-const InputGroup = Input.Group;
 
+interface modalProps extends FormComponentProps{
+    isEdit:boolean
+}
 
-const UserManage = () => {
+const ModalContent = (props:modalProps)=>{
+    const [show,setShow] = useState(false);
+    const { getFieldDecorator } = props.form
+    const showModal = () => {
+        setShow(true);
+    };
+    const handleOk = (e:any) => {
+        console.log(e);
+        setShow(false);
+    };
+    const handleCancel = (e:any) => {
+        console.log(e);
+        setShow(false);
+    };
+    const { isEdit } = props
+    return(
+        <Modal
+            title={ isEdit ? '编辑用户': '新增用户' }
+            visible={ show }
+            onOk={ handleOk }
+            onCancel={ handleCancel }
+            okButtonProps={{ disabled: true }}
+            cancelButtonProps={{ disabled: true }}
+        >
+            <Form>
+                <Form.Item label="邮箱">
+                    { getFieldDecorator('email', {
+                        rules: [
+                            {
+                                type: 'email',
+                                message: '请输入合法的邮箱地址',
+                            },
+                            {
+                                required: true,
+                                message: '请输入邮箱地址',
+                            },
+                        ],
+                    })(<Input />)}
+                </Form.Item>
+                <Form.Item
+                        label="姓名"
+                >
+                    { getFieldDecorator('nickname', {
+                        rules: [{ required: true, message: '请输入姓名', whitespace: true }],
+                    })(<Input />)}
+                </Form.Item>
+                <Form.Item
+                        label="手机号"
+                >
+                    { getFieldDecorator('nickname', {
+                        rules: [{ required: true, message: '请输入姓名', whitespace: true }],
+                    })(<Input />)}
+                </Form.Item>
+                <Form.Item
+                        label="部门"
+                >
+                    { getFieldDecorator('nickname', {
+                        rules: [{ required: true, message: '请选择部门', whitespace: true }],
+                    })(<Input />)}
+                </Form.Item>
+                <Form.Item
+                        label="角色"
+                >
+                    { getFieldDecorator('nickname', {
+                        rules: [{ required: true, message: '请选择角色', whitespace: true }],
+                    })(<Input />)}
+                </Form.Item>
+            </Form>
+        </Modal>
+    )
+}
+
+interface userManageProps extends FormComponentProps {
+    tableData:any,
+    systemUserRequestAction?: any;
+}
+const UserManage = (props:userManageProps) => {
     const [searchValue,setSearchValue] = useState('');
-    const [expandedKeys,setExpandedKeys] = useState([]);
+    const [expandedKeys,setExpandedKeys] = useState(['1']);
     const [autoExpandParent,setAutoExpandParent] = useState(true);
     const [treeData,setTreeData] = useState([]);
-    const [tableData,setTableData] = useState([]);
+    const [treeNodeList,setTreeNodeList] = useState([]);
+    const [roleList,setRoleList] = useState([]);
+    const [searchForm,setSearchForm] = useState('');
+    const [search, setSearch] = useState({
+        keywords:'',
+        department:'',
+        state:0,
+        role:0,
+        departId:'1',
+        pageNum:1,
+        total:0,
+        pageSize:10
+    });
+
+    const handleOff = (args:any) =>{
+        Modal.confirm({
+            title:'提示',
+            content:`是否确认${ args.state == 1 ? '禁用':'启用'}【${ args.userName }】账号？`,
+            centered:true,
+            onOk:()=>{
+                message.success(`${ args.state == 1 ? '禁用':'启用'}成功`)
+            },
+            onCancel:()=>{
+
+            }
+        })
+    }
+    const handleEdit = (args:any) =>{
+
+    }
+    const handleDelete = (args:any) =>{
+
+    }
 
     const columns = [
         {
-            title: 'Name',
-            dataIndex: 'name'
+            title: '账号',
+            dataIndex: 'userName'
         },
         {
-            title: 'Age',
-            dataIndex: 'age',
+            title: '姓名',
+            dataIndex: 'realName',
         },
         {
-            title: 'Address',
-            dataIndex: 'address',
+            title: '手机号',
+            dataIndex: 'mobile',
+        },
+        {
+            title: '部门',
+            dataIndex: 'departName'
+        },
+        {
+            title: '角色',
+            dataIndex: 'roleName',
+        },
+        {
+            title: '状态',
+            dataIndex: 'state',
+        },
+        {
+            title: '操作',
+            key: 'action',
+            render: (text:string,params:any) => (
+                <span className="tableActionCell">
+                    <i onClick={ () => handleOff(params) }>禁用</i>
+                    <i onClick={ () => handleEdit(params) }>编辑</i>
+                    <i onClick={ () => handleDelete(params) }>删除</i>
+                </span>
+            ),
         },
     ];
 
+    const { tableData,systemUserRequestAction } = props;
 
     useEffect(() => {
         //do something
@@ -40,53 +182,107 @@ const UserManage = () => {
 
         };
         getAllDepart(_data).then((data:any) => {
-            console.log(JSON.stringify(data.data))
             setTreeData(data.data);
+            setTreeNodeList(data.data)
+        })
+        systemUserRequestAction(search)
+    },[]);
+
+    useEffect(() => {
+        //do something
+        let _data ={
+            departId: 1
+        };
+        getRoleListByDepartList(_data).then((data:any) => {
+            setRoleList(data.data)
         })
     },[]);
 
-    let aaa =[{"id":1,"parentId":0,"title":"意能通","expand":true,"children":[{"id":2,"parentId":1,"title":"产品部","expand":true,"children":[{"id":8,"parentId":2,"title":"产品一部","expand":true,"children":[],"flag":false},{"id":174,"parentId":2,"title":"产品二部","expand":true,"children":[],"flag":false}],"flag":false},{"id":3,"parentId":1,"title":"测试部","expand":true,"children":[{"id":11,"parentId":3,"title":"测试一部","expand":true,"children":[],"flag":false},{"id":176,"parentId":3,"title":"测试二部","expand":true,"children":[],"flag":false},{"id":178,"parentId":3,"title":"测试三部","expand":true,"children":[],"flag":false}],"flag":false},{"id":52,"parentId":1,"title":"技术部","expand":true,"children":[{"id":53,"parentId":52,"title":"前端组","expand":true,"children":[],"flag":false},{"id":123,"parentId":52,"title":"研发一组","expand":true,"children":[],"flag":false},{"id":175,"parentId":52,"title":"开发二组","expand":true,"children":[],"flag":false},{"id":177,"parentId":52,"title":"开发三部","expand":true,"children":[],"flag":false}],"flag":false}],"flag":true}];
+    //分页操作
+    const changePage = (pageNum:any,pageSize:any) =>{
+        let _search = {
+            ...search,
+            pageNum,
+            pageSize
+        }
+        setSearch(_search)
+        systemUserRequestAction(_search)
+    }
+    const changePageSize = (pageNum:any,pageSize:any) =>{
+        console.log(pageNum,pageSize)
+        let _search = {
+            ...search,
+            pageNum,
+            pageSize
+        }
+        setSearch(_search)
+        systemUserRequestAction(_search)
+    }
+    const paginationProps = {
+        current:tableData.pageNum,
+        pageSize:tableData.pageSize,
+        total:tableData.total,
+        size:'middle',
+        showQuickJumper:true,
+        showSizeChanger:true,
+        onChange:changePage,
+        onShowSizeChange:changePageSize
+    }
 
-    const loop = (data:any):any =>(
-       data.map((item:any) => {
-            if (item.children.length) {
-                return (
-                        <TreeNode key={ item.id } title={item.title}>
-                            { loop(item.children) }
-                        </TreeNode>
-                );
-            }
-            return <TreeNode key={item.id} title={item.title} />;
-        })
-    )
-
-
-
-
+    const searchSubmit = (e:any)=>{
+        console.log(e);
+        let _search = {
+            ...search,
+            ...e
+        }
+        setSearch(_search)
+        console.log(search)
+        systemUserRequestAction(_search)
+    }
 
     const onChange = (e:any) => {
-        const { value } = e.target;
-        // const expandedKeys:any = dataList
-        //         .map((item:any) => {
-        //             if (item.title.indexOf(value) > -1) {
-        //                 return item.parentId;
-        //             }
-        //             return null;
-        //         })
-        //         .filter((item:any, i:number, self:any) => item && self.indexOf(item) === i);
-        setExpandedKeys(expandedKeys);
+        const { value } = e.target
+        const temp = searchTree(value,treeData)
+        setTreeNodeList(temp)
+        let _expandArr:any = temp[0]&&temp[0].children
+                .map((item:any) => {
+                    return item.id.toString()
+                });
+        _expandArr = _expandArr && _expandArr.concat(['1']) || _expandArr;
+
+        setExpandedKeys(_expandArr);
         setSearchValue(value);
         setAutoExpandParent(true)
     };
 
-    const handleChange = (value:any) => {
-        console.log(value); // { key: "lucy", label: "Lucy (101)" }
+    const handleTreeSelect = (value:any,e:any) => {
+        if(!e.selected) return false;
+        let _search = {
+            ...search,
+            departId:value[0]
+        }
+        setSearch(_search)
+        console.log(search)
+        systemUserRequestAction(_search)
     }
 
     const onExpand = (expandedKeys:any) => {
         setExpandedKeys(expandedKeys);
         setAutoExpandParent(false)
     };
+
+    const loop = (data:any):any =>(
+            data.map((item:any) => {
+                if (item.children.length) {
+                    return (
+                            <TreeNode key={ item.id } title={item.title}>
+                                { loop(item.children) }
+                            </TreeNode>
+                    );
+                }
+                return <TreeNode key={ item.id } title={ item.title } />;
+            })
+    )
 
     const rowSelection = {
         onChange: (selectedRowKeys:any, selectedRows:any) => {
@@ -103,53 +299,28 @@ const UserManage = () => {
             <div className="user-wrapper-left">
                 <Search style={{ marginBottom: 8 }} placeholder="部门名称" onChange={ onChange } />
                 {
-                    treeData.length ? (
+                    treeNodeList.length ? (
                         <Tree
                             onExpand={ onExpand }
                             expandedKeys={ expandedKeys }
-                            autoExpandParent>
-                            { loop(aaa) }
+                            defaultExpandParent = { true } onSelect={ handleTreeSelect }>
+                            { loop(treeNodeList) }
                         </Tree>
-                    ) : 'loading'
+                    ) : 'loading...'
                 }
             </div>
             <div className="user-wrapper-right">
-                <div className="search-container">
-                    <div className="input-cells">
-                        <Select
-                                labelInValue
-                                defaultValue={{ key: '' }}
-                                style={{ width: 120 }}
-                                onChange={ handleChange }
-                        >
-                            <Option value="">全部角色</Option>
-                            <Option value="1">管理员</Option>
-                        </Select>
-                        <Select
-                                labelInValue
-                                defaultValue={{ key: '' }}
-                                style={{ width: 120 }}
-                                onChange={ handleChange }
-                        >
-                            <Option value="">全部</Option>
-                            <Option value="1">正常</Option>
-                            <Option value="0">禁用</Option>
-                        </Select>
-                    </div>
-                    <div className="input-cells">
-                        <InputGroup compact>
-                            <Select defaultValue="account">
-                                <Option value="account">账号</Option>
-                                <Option value="name">姓名</Option>
-                                <Option value="mobile">手机号</Option>
-                            </Select>
-                            <Input style={{ width: 180 }} placeholder="账号/姓名/手机号" />
-                        </InputGroup>
-                        <Button type="primary">重置密码</Button>
-                    </div>
-                </div>
+                <UserSearchComponent
+                        roleList={ roleList }
+                        searchSubmit={ searchSubmit } />
                 <div className="table-container">
-                    <Table bordered rowSelection={ rowSelection } columns={ columns } dataSource={ tableData } />
+                    <Table size="middle"
+                           bordered
+                           rowSelection={ rowSelection }
+                           rowKey="id"
+                           columns={ columns }
+                           pagination = { paginationProps }
+                           dataSource={ tableData.list } />
                 </div>
                 <div className="page-container"></div>
             </div>
@@ -157,4 +328,13 @@ const UserManage = () => {
     );
 }
 
-export default UserManage
+
+const mapStateToProps = (state:any) => ({
+    tableData:state.system.tableData
+})
+
+const mapDispatchToProps = {
+    systemUserRequestAction
+}
+
+export default connect(mapStateToProps,mapDispatchToProps)(UserManage)
