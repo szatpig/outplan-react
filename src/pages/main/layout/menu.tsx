@@ -58,19 +58,10 @@ class MenuLayout extends Component<Props, State> {
         }
     }
 
-    componentWillMount(){
-        const { location:{ pathname },menuList } = this.props;
-        this.menuFilter(JSON.parse(JSON.stringify(menuList)),pathname);
-    }
 
     componentDidMount() {
-
-    }
-
-    componentDidUpdate() {
-    }
-
-    componentWillUnmount() {
+        const { location:{ pathname },menuList } = this.props;
+        this.menuFilter(JSON.parse(JSON.stringify(menuList)),pathname);
     }
 
     render() {

@@ -1,97 +1,20 @@
 // Created by szatpig at 2019/8/21.
 import React, { useState, useEffect, useReducer, forwardRef } from 'react';
 import { connect } from 'react-redux'
-import { Tree, Input, Select, Button, Table, Form, Modal, message } from 'antd';
+import { Tree, Input, Select, Button, Table, Form, Modal, message, Icon } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 
 import { systemUserRequestAction } from './../../../store/actions/system'
 
 import UserSearchComponent from './components/UserSearchComponent'
+import UserModal from './components/userModal'
 
 import searchTree from './../../../utils/treeNode'
-import { getAllDepart, userInfoList, getRoleListByDepartList, getDpartAndChild } from './../../../api/system-api'
+import { getAllDepart, userInfoList, getRoleListByDepartList, getDpartAndChild, getRandomPwd, addUser, updateUser, deleteUser, updateUserStatus } from './../../../api/system-api'
 import  './../../../less/system/user.less'
-import EnhancedUserSearchComponent from "./components/UserSearchComponent";
 
 const { TreeNode } = Tree;
 const { Search } = Input;
-const { Option } = Select;
-
-interface modalProps extends FormComponentProps{
-    isEdit:boolean
-}
-
-const ModalContent = (props:modalProps)=>{
-    const [show,setShow] = useState(false);
-    const { getFieldDecorator } = props.form
-    const showModal = () => {
-        setShow(true);
-    };
-    const handleOk = (e:any) => {
-        console.log(e);
-        setShow(false);
-    };
-    const handleCancel = (e:any) => {
-        console.log(e);
-        setShow(false);
-    };
-    const { isEdit } = props
-    return(
-        <Modal
-            title={ isEdit ? '编辑用户': '新增用户' }
-            visible={ show }
-            onOk={ handleOk }
-            onCancel={ handleCancel }
-            okButtonProps={{ disabled: true }}
-            cancelButtonProps={{ disabled: true }}
-        >
-            <Form>
-                <Form.Item label="邮箱">
-                    { getFieldDecorator('email', {
-                        rules: [
-                            {
-                                type: 'email',
-                                message: '请输入合法的邮箱地址',
-                            },
-                            {
-                                required: true,
-                                message: '请输入邮箱地址',
-                            },
-                        ],
-                    })(<Input />)}
-                </Form.Item>
-                <Form.Item
-                        label="姓名"
-                >
-                    { getFieldDecorator('nickname', {
-                        rules: [{ required: true, message: '请输入姓名', whitespace: true }],
-                    })(<Input />)}
-                </Form.Item>
-                <Form.Item
-                        label="手机号"
-                >
-                    { getFieldDecorator('nickname', {
-                        rules: [{ required: true, message: '请输入姓名', whitespace: true }],
-                    })(<Input />)}
-                </Form.Item>
-                <Form.Item
-                        label="部门"
-                >
-                    { getFieldDecorator('nickname', {
-                        rules: [{ required: true, message: '请选择部门', whitespace: true }],
-                    })(<Input />)}
-                </Form.Item>
-                <Form.Item
-                        label="角色"
-                >
-                    { getFieldDecorator('nickname', {
-                        rules: [{ required: true, message: '请选择角色', whitespace: true }],
-                    })(<Input />)}
-                </Form.Item>
-            </Form>
-        </Modal>
-    )
-}
 
 interface userManageProps extends FormComponentProps {
     tableData:any,
@@ -104,25 +27,46 @@ const UserManage = (props:userManageProps) => {
     const [treeData,setTreeData] = useState([]);
     const [treeNodeList,setTreeNodeList] = useState([]);
     const [roleList,setRoleList] = useState([]);
-    const [searchForm,setSearchForm] = useState('');
     const [search, setSearch] = useState({
         keywords:'',
         department:'',
         state:0,
         role:0,
-        departId:'1',
+        departId:1,
         pageNum:1,
         total:0,
         pageSize:10
     });
+    const [show,setShow] = useState(false);
+    const [isEdit,setIsEdit] = useState(0);
+    const [userInfo,setUserInfo] = useState({
+        userId:'',
+        email:'',
+        password: '',
+        userName:'',
+        realName:'',
+        mobile:'',
+        departId:'',
+        roleIds:[]
+    })
 
     const handleOff = (args:any) =>{
+        let { id,state,userName } = args;
         Modal.confirm({
             title:'提示',
-            content:`是否确认${ args.state == 1 ? '禁用':'启用'}【${ args.userName }】账号？`,
+            content:`是否确认${ state == 1 ? '禁用':'启用'}【${ userName }】账号？`,
             centered:true,
             onOk:()=>{
-                message.success(`${ args.state == 1 ? '禁用':'启用'}成功`)
+
+                updateUserStatus({
+                    id,
+                    status: state == 1 ? 2 : 1
+                }).then( data => {
+                    systemUserRequestAction(search)
+                    message.success(`${ state == 1 ? '禁用':'启用'}成功`)
+                }).catch(()=>{
+
+                });
             },
             onCancel:()=>{
 
@@ -130,10 +74,33 @@ const UserManage = (props:userManageProps) => {
         })
     }
     const handleEdit = (args:any) =>{
-
+        setIsEdit(1)
+        setShow(true)
+        setUserInfo({
+            ...userInfo,
+            ...args,
+            roleIds:args.roleId,
+            userId:args.id
+        })
     }
     const handleDelete = (args:any) =>{
+        let { id,userName } = args;
+        Modal.confirm({
+            title:'提示',
+            content:`是否确认删除【${ userName }】账号？`,
+            centered:true,
+            onOk:()=>{
+                deleteUser({ userId:id }).then( data => {
+                    systemUserRequestAction(search)
+                    message.success(`删除成功`);
+                }).catch(()=>{
 
+                })
+            },
+            onCancel:()=>{
+
+            }
+        })
     }
 
     const columns = [
@@ -159,22 +126,39 @@ const UserManage = (props:userManageProps) => {
         },
         {
             title: '状态',
-            dataIndex: 'state',
+            key:'state',
+            render: (text:string,params:any) => (
+                <span>
+                    {
+                        params.state == 1 ? <Icon type="check-circle" style={{color: '#19be6b'}} theme="filled" />:<Icon type="minus-circle" style={ {color: '#f00'} } theme="filled" />
+                    }
+                    <i>{ params.state == 1 ? ' 启用':' 禁用' }</i>
+                </span>
+            )
         },
         {
             title: '操作',
             key: 'action',
             render: (text:string,params:any) => (
                 <span className="tableActionCell">
-                    <i onClick={ () => handleOff(params) }>禁用</i>
+                    <i onClick={ () => handleOff(params) }>{ params.state == 1 ? '禁用':'启用' }</i>
                     <i onClick={ () => handleEdit(params) }>编辑</i>
                     <i onClick={ () => handleDelete(params) }>删除</i>
                 </span>
-            ),
-        },
+            )
+        }
     ];
 
     const { tableData,systemUserRequestAction } = props;
+    const loopTree = (data:any) =>{
+       return data.map((item:any)=>{
+            item.value = item.id
+            if(item.children.length){
+                loopTree(item.children)
+            }
+            return item
+        })
+    }
 
     useEffect(() => {
         //do something
@@ -182,7 +166,8 @@ const UserManage = (props:userManageProps) => {
 
         };
         getAllDepart(_data).then((data:any) => {
-            setTreeData(data.data);
+            let _data:any = loopTree(JSON.parse(JSON.stringify(data.data)));
+            setTreeData(_data);
             setTreeNodeList(data.data)
         })
         systemUserRequestAction(search)
@@ -197,6 +182,7 @@ const UserManage = (props:userManageProps) => {
             setRoleList(data.data)
         })
     },[]);
+
 
     //分页操作
     const changePage = (pageNum:any,pageSize:any) =>{
@@ -238,6 +224,64 @@ const UserManage = (props:userManageProps) => {
         setSearch(_search)
         console.log(search)
         systemUserRequestAction(_search)
+    }
+
+    const handleUserSubmit = (arg:any) => {
+        console.log(11,{...userInfo,...arg})
+        let args = { ...userInfo,...arg }
+        let { userId, email , realName, mobile, departId, password, roleIds } = args
+        if(isEdit){
+            let _data = {
+                userId,
+                email,
+                userName:email,
+                realName,
+                mobile,
+                departId,
+                roleIds:args.roleId
+            }
+            updateUser(_data).then(data => {
+                setShow(false);
+                message.success('用户修改成功');
+                systemUserRequestAction(search)
+
+            })
+        }else{
+            let _data = {
+                userId,
+                email,
+                password,
+                userName:email,
+                realName,
+                mobile,
+                departId,
+                roleIds
+            }
+            addUser(_data).then(data => {
+                setShow(false);
+                message.success('用户添加成功');
+                systemUserRequestAction(search)
+            })
+        }
+    }
+    const handleShowModal = (type:number,flag:boolean) =>{
+        if(flag){
+
+            getRandomPwd({}).then((data:any) =>{
+                setUserInfo({
+                    userId:'',
+                    email:'',
+                    password: data.data,
+                    userName:'',
+                    realName:'',
+                    mobile:'',
+                    departId:search.departId.toString(),
+                    roleIds:[]
+                })
+            })
+        }
+        setIsEdit(type)
+        setShow(flag)
     }
 
     const onChange = (e:any) => {
@@ -312,7 +356,7 @@ const UserManage = (props:userManageProps) => {
             <div className="user-wrapper-right">
                 <UserSearchComponent
                         roleList={ roleList }
-                        searchSubmit={ searchSubmit } />
+                        searchSubmit={ searchSubmit } handleShow={ handleShowModal } />
                 <div className="table-container">
                     <Table size="middle"
                            bordered
@@ -324,6 +368,13 @@ const UserManage = (props:userManageProps) => {
                 </div>
                 <div className="page-container"></div>
             </div>
+            <UserModal
+                    isEdit={ isEdit }
+                    show={ show }
+                    userInfo={ userInfo }
+                    treeData={ treeData }
+                    handleShow ={ handleShowModal }
+                    handleSubmit={ handleUserSubmit } />
         </div>
     );
 }

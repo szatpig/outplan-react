@@ -1,19 +1,18 @@
 // Created by szatpig at 2019/12/18.
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux'
-import { Tree, Input, Select, Button, Table, Form } from 'antd';
+import { Input, Select, Button, Form } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 
 const { Option } = Select;
 
 function UserSearchComponent(props:userManageProps) {
 
-    const { roleList } = props
+    const { roleList, handleShow } = props
     const { getFieldDecorator } = props.form;
 
     useEffect(() => {
         //do something
-    });
+    },[]);
 
     const prefixSelector = getFieldDecorator('prefix', {
         initialValue: 'userName',
@@ -70,6 +69,7 @@ function UserSearchComponent(props:userManageProps) {
                 </div>
                 <div className="input-cells">
                     <Button type="primary">重置密码</Button>
+                    <Button type="primary" onClick={ () => handleShow(0,true) }>添加用户</Button>
                 </div>
             </div>
     );
@@ -78,6 +78,7 @@ function UserSearchComponent(props:userManageProps) {
 interface userManageProps extends FormComponentProps {
     roleList:any,
     searchSubmit:(...args:any) => void,
+    handleShow:(type:number,flag:boolean) => void,
     systemUserRequestAction?: any;
 }
 

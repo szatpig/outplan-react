@@ -20,7 +20,7 @@ axios.interceptors.request.use(
         if (token) {
             config.headers.token = token;
         }
-        message.loading('加载中...',15);
+        // message.loading('加载中...',15);
         return config;
     },
     err => {
@@ -30,7 +30,6 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
     response => {
-        message.destroy();
         return response;
     },
     error => {
