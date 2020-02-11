@@ -6,6 +6,19 @@ export const getAllDepart= (params:any) => fetch(site.base + '/depart/getAllDepa
     type: 'get',
     params
 });
+export const deleteDepart= (data:any) => fetch(site.base + '/depart/deleteDepart' ,{
+    type: 'post',
+    data
+});
+export const updateDepart= (data:any) => fetch(site.base + '/depart/updateDepart' ,{
+    type: 'post',
+    data
+});
+export const addDepart= (data:any) => fetch(site.base + '/depart/addDepart' ,{
+    type: 'post',
+    data
+});
+
 
 export const userInfoList= (data:any) => fetch(site.base + '/userinfo/queryUserInfoList' ,{
     type: 'post',
@@ -37,7 +50,6 @@ export const updateUserStatus= (data:any) => fetch(site.base + '/userinfo/upUser
     data
 });
 
-
 export const userRoleList= (data:any) => fetch(site.base + '/role/queryRoleList' ,{
     type: 'post',
     data
@@ -48,7 +60,7 @@ export const getRoleListByDepartList= (data:any) => fetch(site.base + '/role/get
     data
 });
 
-export const getDpartAndChild= (params:any) => fetch(site.base + '/userinfo/getDpartAndChild' ,{
+export const getDepartAndChild= (params:any) => fetch(site.base + '/userinfo/getDpartAndChild' ,{
     type: 'get',
     params
 });

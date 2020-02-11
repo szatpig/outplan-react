@@ -1,5 +1,5 @@
 // Created by szatpig at 2019/9/5.
-import { take, fork, call, put  } from 'redux-saga/effects';
+import { take,  call, put  } from 'redux-saga/effects';
 
 import { userLogin,getRoleMenu } from './../../api/login-api'
 
@@ -22,7 +22,7 @@ export function* loginFlow() {
 
     while (true){
         const { payload } = yield take('LOGIN_REQUEST')
-        const data = yield call(loginAsync,payload);
+        yield call(loginAsync,payload);
     }
 
 }

@@ -1,5 +1,5 @@
 // Created by szatpig at 2019/12/16.
-import { take, fork, call, put  } from 'redux-saga/effects';
+import { take, call, put  } from 'redux-saga/effects';
 import { userInfoList } from './../../api/system-api'
 
 function* systemUserAsync(payload:any) {
@@ -14,6 +14,6 @@ function* systemUserAsync(payload:any) {
 export function* systemFlow() {
     while (true){
         const { payload } = yield take('SYSTEM_USER_LIST_REQUEST')
-        const data = yield call(systemUserAsync,payload)
+        yield call(systemUserAsync,payload)
     }
 }

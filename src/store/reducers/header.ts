@@ -15,7 +15,6 @@ let headerReducer = (state = initState, action:any) => {
     switch (action.type){
         case HEADER_COLLAPSED:
             return Object.assign({},state,{ collapsed:!state.collapsed });
-            break;
         default:
             return state
     }

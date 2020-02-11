@@ -9,7 +9,6 @@ const systemReducer = (state:State = initState,action:any):any =>{
     switch (action.type){
         case SYSTEM_USER_LIST:
             return Object.assign({},state,{ tableData:action.payload });
-            break;
         default:
             return state
     }

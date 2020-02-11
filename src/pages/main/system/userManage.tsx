@@ -10,7 +10,7 @@ import UserSearchComponent from './components/UserSearchComponent'
 import UserModal from './components/userModal'
 
 import searchTree from './../../../utils/treeNode'
-import { getAllDepart, userInfoList, getRoleListByDepartList, getDpartAndChild, getRandomPwd, addUser, updateUser, deleteUser, updateUserStatus } from './../../../api/system-api'
+import { getAllDepart, userInfoList, getRoleListByDepartList, getDepartAndChild, getRandomPwd, addUser, updateUser, deleteUser, updateUserStatus } from './../../../api/system-api'
 import  './../../../less/system/user.less'
 
 const { TreeNode } = Tree;

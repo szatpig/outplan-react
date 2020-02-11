@@ -1,5 +1,5 @@
 // Created by szatpig at 2019/12/18.
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Input, Select, Button, Form } from 'antd';
 import { FormComponentProps } from 'antd/es/form';
 

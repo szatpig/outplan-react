@@ -21,16 +21,12 @@ let userReducer = (state:State = initState,action:any):any => {
                 menuList:[],
                 info:null
             };
-            break;
         case USER_TOKEN:
             return Object.assign({},state,action.payload);
-            break;
         case USER_INFO:
             return Object.assign({},state,action.payload);
-            break;
         case USER_MENU_LIST:
             return Object.assign({},state,{ menuList:action.payload });
-            break;
         default:
             return state
     }

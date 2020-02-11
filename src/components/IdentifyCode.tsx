@@ -1,5 +1,5 @@
 // Created by szatpig at 2019/8/22.
-import React, {useState, useEffect, useRef, Component} from 'react';
+import React, { Component } from 'react';
 import EnhanceWithClickOutside from 'react-click-outside';
 import { Icon, Button } from 'antd';
 
